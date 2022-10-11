@@ -51,9 +51,19 @@ func SolveEquation(m [][]float64) []float64 {
 	*/
 	// i, j := 0, 0
 	// ValidateEquation(m) //? if # of rows & cols not valid, panic...
-	output := m
+	output := m // FIXME: change m to output in the code
+	var p *float64
 	for i, row := range output {
+		p = &m[i][i]
+		pValue := *p
 		// if the m[i][i] != 1, then divide the entire line/row by m[i][i]
+		if m[i][i] != 1 {
+			for j, val := range row {
+				m[i][j] /= pValue
+				fmt.Printf("%.2f -> %.2f\n", val, m[i][j])
+			}
+		}
+		fmt.Printf("Pivot is now %.2f\n", *p)
 
 		// check if the bottom or elements of 1 are not 0, enter a loop to make them 0
 		for j, val := range row {
