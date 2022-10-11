@@ -4,6 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"log"
+	"math"
 	"os"
 	"strconv"
 )
@@ -11,9 +12,9 @@ import (
 // maybe we'd better change the name of the file to something else like problem solver. the same with the main function name
 
 func main() {
-	fmt.Println("===========================================================================================")
-	fmt.Println("Linear Algebra Equations Solver by Amirhossein Shakeri (amirhossein.shakeri.work@gmail.com)")
-	fmt.Println("===========================================================================================")
+	fmt.Println("==========================================================================================")
+	fmt.Println("Linear Algebra Equation Solver by Amirhossein Shakeri (amirhossein.shakeri.work@gmail.com)")
+	fmt.Println("==========================================================================================")
 
 	// get user input to read the file name
 	filePath := Input("Please enter the file path: ", "./3x2.equation.csv")
@@ -37,41 +38,49 @@ func main() {
 	matrix := StringToFloat(data)
 
 	// Solve the problem
-	SolveEquation(matrix)
+	answers := SolveEquation(matrix)
 
 	// show the answer
+	fmt.Println("Answers: ", answers)
 }
 
 func SolveEquation(m [][]float64) []float64 {
-	/* x=2, y=1
-	[
-		[3,3,9],
-		[2,4,8],
-	]
-	*/
-	// i, j := 0, 0
 	// ValidateEquation(m) //? if # of rows & cols not valid, panic...
-	output := m // FIXME: change m to output in the code
+	matrix := m
 	var p *float64
-	for i, row := range output {
-		p = &m[i][i]
+	for i, row := range matrix {
+		p = &matrix[i][i]
 		pValue := *p
-		// if the m[i][i] != 1, then divide the entire line/row by m[i][i]
-		if m[i][i] != 1 {
+		if pValue != 1 {
 			for j, val := range row {
-				m[i][j] /= pValue
-				fmt.Printf("%.2f -> %.2f\n", val, m[i][j])
+				matrix[i][j] /= pValue
+				fmt.Printf("%.2f -> %.2f\n", val, matrix[i][j])
 			}
 		}
-		fmt.Printf("Pivot is now %.2f\n", *p)
+		fmt.Printf("Pivot is now %.2f at {%d,%d}\n", *p, i, i)
+		// fmt.Println(output)
 
 		// check if the bottom or elements of 1 are not 0, enter a loop to make them 0
-		for j, val := range row {
-			fmt.Printf("Passing x=%d y=%d val=%.2f \n", i, j, val)
-			// ?if iterating over the last column, skip? I think it's not gonna happen if we validate the # of rows & cols
+		// if i != 0 {
+		// resetAbove = true
+		for k, targetRow := range matrix {
+			if k == i { // skip the pivot
+				continue
+			}
+			ratio := targetRow[i] / matrix[i][i]
+			for j := i; j < len(targetRow); j++ {
+				fmt.Printf("-%.2fx{%d,%d} -> {%d,%d}: %.2f - %.2f = %.2f | Matrix: ", ratio, j, i, j, k, targetRow[j], ratio*matrix[i][j], targetRow[j])
+				targetRow[j] -= ratio * matrix[i][j]
+				fmt.Printf("%v\n", matrix)
+			}
 		}
 	}
-	return []float64{0, 0}
+
+	answers := make([]float64, len(matrix))
+	for order, answer := range matrix {
+		answers[order] = math.Round(answer[len(answer)-1])
+	}
+	return answers
 }
 
 func StringToFloat(arr [][]string) [][]float64 {
